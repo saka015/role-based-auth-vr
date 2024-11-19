@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -35,12 +36,27 @@ export default function Register() {
       setIsSubmitting(true);
       setErrors({});
       try {
-        // Simulating an API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setSubmitMessage("User registered successfully!");
-        setFormData({ name: "", email: "", password: "", image: null });
+        const formDataObj = new FormData();
+        formDataObj.append("name", formData.name);
+        formDataObj.append("email", formData.email);
+        formDataObj.append("password", formData.password);
+        formDataObj.append("image", formData.image);
+
+        const response = await axios.post(
+          "http://localhost:5000/api/users/register",
+          formDataObj,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (response.status === 201) {
+          setSubmitMessage("User registered successfully!");
+          setFormData({ name: "", email: "", password: "", image: null });
+        }
       } catch (error) {
-        setSubmitMessage("Registration failed. Please try again.");
+        setSubmitMessage(
+          error.response?.data?.message ||
+            "Registration failed. Please try again."
+        );
       } finally {
         setIsSubmitting(false);
       }
@@ -60,16 +76,13 @@ export default function Register() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="name" className="sr-only">
-                Name
-              </label>
               <input
                 id="name"
                 name="name"
                 type="text"
+                placeholder="Name"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
-                placeholder="Name"
                 value={formData.name}
                 onChange={handleChange}
               />
@@ -78,17 +91,13 @@ export default function Register() {
               )}
             </div>
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
               <input
                 id="email-address"
                 name="email"
                 type="email"
-                autoComplete="email"
+                placeholder="Email address"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
-                placeholder="Email address"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -97,17 +106,13 @@ export default function Register() {
               )}
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="new-password"
+                placeholder="Password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
-                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -116,15 +121,12 @@ export default function Register() {
               )}
             </div>
             <div>
-              <label htmlFor="image" className="sr-only">
-                Profile Image
-              </label>
               <input
                 id="image"
                 name="image"
                 type="file"
-                required
                 accept="image/*"
+                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                 onChange={handleChange}
               />
@@ -133,7 +135,6 @@ export default function Register() {
               )}
             </div>
           </div>
-
           <div>
             <button
               type="submit"

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -37,12 +38,28 @@ export default function Login() {
       setIsSubmitting(true);
       setErrors({});
       try {
-        // Simulating an API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setSubmitMessage("Login successful!");
-        setFormData({ email: "", password: "" });
+        const response = await axios.post(
+          "http://localhost:5000/api/users/login",
+          {
+            email: formData.email,
+            password: formData.password,
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        if (response.status === 200) {
+          setSubmitMessage("Login successful!");
+          console.log("Login successful!");
+          localStorage.setItem("token", response.data.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.data.user));
+          setFormData({ email: "", password: "" });
+          // Optionally, redirect the user to a protected route
+          // e.g., window.location.href = "/dashboard";
+        }
       } catch (error) {
-        setSubmitMessage("Login failed. Please try again.");
+        setSubmitMessage(
+          error.response?.data?.message || "Login failed. Please try again."
+        );
       } finally {
         setIsSubmitting(false);
       }
@@ -62,17 +79,13 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
               <input
                 id="email-address"
                 name="email"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -81,17 +94,13 @@ export default function Login() {
               )}
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -100,33 +109,6 @@ export default function Login() {
               )}
             </div>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot your password?
-              </a>
-            </div>
-          </div>
-
           <div>
             <button
               type="submit"
