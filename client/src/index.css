@@ -11,8 +11,18 @@ background-size: 20px 20px;
 background-position: 0 0,10px 10px;
 }
 
+.dot-bg-dark{
+  background-color: #110421;
+opacity: 0.8;
+background-image:  radial-gradient(#d9dbfd 0.5px, transparent 0.5px), radial-gradient(#d9dbfd 0.5px, #110421 0.5px);
+background-size: 20px 20px;
+background-position: 0 0,10px 10px;
+}
+
+
 .txt-gr{
   background: -webkit-linear-gradient(#eee, #4f46e5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+

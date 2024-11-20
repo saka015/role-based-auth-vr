@@ -4,6 +4,7 @@ import Register from "./pages/Register/Register";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import Home from "./pages/Home/Home";
+import AdminDashboard from "./pages/admin/Dashboard/AdminDashboard";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const App = () => {
         {
           path: "/register",
           element: <Register />,
+        },
+        {
+          path: "/admin/dashboard",
+          element: <AdminDashboard />,
         },
       ],
     },
