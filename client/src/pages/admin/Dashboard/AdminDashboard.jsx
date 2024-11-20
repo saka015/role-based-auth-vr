@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { CiMenuKebab } from "react-icons/ci";
 import DialogBox from "../../../components/UI/Dialog/DialogBox";
+import { Alert,message } from "antd";
+import Swal from "sweetalert2";
 
 const usersData = [
   {
@@ -67,13 +69,13 @@ const usersData = [
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState(usersData);
-  const [editingEmail, setEditingEmail] = useState(null); // Use email or unique identifier
+  const [editingEmail, setEditingEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const usersPerPage = 6;
 
   const handleEditClick = (email) => {
-    setEditingEmail(editingEmail === email ? null : email); // Toggle edit mode
+    setEditingEmail(editingEmail === email ? null : email);
   };
 
   const handleAccessChange = (email, newAccess) => {
@@ -98,6 +100,30 @@ const AdminDashboard = () => {
     setCurrentPage(page);
   };
 
+  const addUser = (newUser) => {
+    setUsers((prevUsers) => [...prevUsers, newUser]);
+  };
+
+ const handleDeleteUser = (email) => {
+   Swal.fire({
+     title: "Are you sure?",
+     text: "You won't be able to revert this!",
+     icon: "warning",
+     showCancelButton: true,
+     confirmButtonColor: "#3085d6",
+     cancelButtonColor: "#d33",
+     confirmButtonText: "Yes, delete it!",
+   }).then((result) => {
+     if (result.isConfirmed) {
+       // Perform delete action here
+       setUsers((prevUsers) =>
+         prevUsers.filter((user) => user.email !== email)
+       );
+       Swal.fire("Deleted!", "The user has been deleted.", "success");
+     }
+   });
+ };
+
   return (
     <div className="dot-bg min-h-screen p-6">
       <div className="bg-white p-4 px-10 rounded-xl shadow-lg">
@@ -107,9 +133,9 @@ const AdminDashboard = () => {
         </p>
 
         <div className="flex justify-between items-center mt-12">
-          <h2 className="font-semibold text-xl">
+          <h2 className="font-semibold text-xl flex justify-center items-centerd">
             All Users{" "}
-            <span className="text-gray-400">{filteredUsers.length}</span>
+            <span className="text-gray-400 ml-2">{filteredUsers.length}</span>
           </h2>
           <div className="right flex gap-4">
             <div className="">
@@ -123,20 +149,22 @@ const AdminDashboard = () => {
               />
             </div>
             <button className="bg-indigo-600 hover:bg-indigo-800 active:bg-indigo-400 text-white px-4 py-2 rounded-md">
-              <DialogBox name="Add dUser" />
+              <DialogBox name="Add User" onAddUser={addUser} />
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full mt-4">
+        <div className="overflow-x-auto min-h-96">
+          <table className="min-w-full mt-4 ">
             <thead>
               <tr className="bg-gray-100 text-center">
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Email</th>
                 <th className="px-4 py-2 text-left">Date Added</th>
                 <th className="px-4 py-2 text-left">Access</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+                <th className="px-4 py-2 text-left float-right mr-28">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -172,12 +200,22 @@ const AdminDashboard = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="flex float-right gap-3 px-4 py-2">
                     <button
-                      className="bg-gray-200 hover:bg-indigo-200 hover:text-indigo-700 text-gray-600 cursor-pointer py-1 px-6 rounded-sm"
+                      className={`${
+                        editingEmail !== user.email
+                          ? "bg-gray-200"
+                          : "bg-green-200"
+                      }  hover:bg-indigo-200 hover:text-indigo-700 text-gray-600 cursor-pointer py-2 px-6 rounded-sm`}
                       onClick={() => handleEditClick(user.email)}
                     >
                       {editingEmail === user.email ? "Save" : "Edit"}
+                    </button>
+                    <button
+                      className="bg-red-200 hover:bg-red-300 hover:text-red-700 text-red-600 cursor-pointer py-2 px-6 rounded-sm"
+                      onClick={() => handleDeleteUser(user.email)}
+                    >
+                      Delete User
                     </button>
                   </td>
                 </tr>
@@ -195,7 +233,9 @@ const AdminDashboard = () => {
             Prev
           </button>
 
-          <span className="px-4 py-2">{currentPage}</span>
+          <span className="px-4 py-2">
+            {currentPage} - {Math.ceil(filteredUsers.length / usersPerPage)}
+          </span>
 
           <button
             className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"

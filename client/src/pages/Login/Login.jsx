@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { message } from "antd";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -49,18 +50,15 @@ export default function Login() {
         );
 
         if (response.status === 200) {
-          setSubmitMessage("Login successful!");
           console.log("Login successful!");
+          message.success("Login successful!");
           localStorage.setItem("token", response.data.data.token);
           localStorage.setItem("user", JSON.stringify(response.data.data.user));
           setFormData({ email: "", password: "" });
-          // Optionally, redirect the user to a protected route
-          // e.g., window.location.href = "/dashboard";
         }
       } catch (error) {
-        setSubmitMessage(
-          error.response?.data?.message || "Login failed. Please try again."
-        );
+        console.log(error.response?.data?.message);
+        message.error("Login failed!");
       } finally {
         setIsSubmitting(false);
       }
@@ -120,20 +118,16 @@ export default function Login() {
             </button>
           </div>
 
-          <div className="flex justify-center items-center">Not registered? <Link className="text-indigo-500 ml-1 hover:underline" to='/register'>Register!</Link> </div>
-
-        </form>
-        {submitMessage && (
-          <div
-            className={`mt-4 text-center ${
-              submitMessage.includes("successful")
-                ? "text-green-600"
-                : "text-red-600"
-            }`}
-          >
-            {submitMessage}
+          <div className="flex justify-center items-center">
+            Not registered?{" "}
+            <Link
+              className="text-indigo-500 ml-1 hover:underline"
+              to="/register"
+            >
+              Register!
+            </Link>{" "}
           </div>
-        )}
+        </form>
       </div>
     </div>
   );

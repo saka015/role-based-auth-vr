@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { message } from "antd";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,7 +14,6 @@ export default function Register() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -50,14 +52,19 @@ export default function Register() {
         );
 
         if (response.status === 201) {
-          setSubmitMessage("User registered successfully!");
+          message.success("User registered successfully!");
           setFormData({ name: "", email: "", password: "", image: null });
+
+          const key = "redirecting";
+          message.loading({ content: "Redirecting to login...", key });
+
+          setTimeout(() => {
+            message.success({ content: "Redirecting to login...", key });
+            navigate("/login");
+          }, 2000);
         }
       } catch (error) {
-        setSubmitMessage(
-          error.response?.data?.message ||
-            "Registration failed. Please try again."
-        );
+        message.error("Registration failed. Please try again.");
       } finally {
         setIsSubmitting(false);
       }
@@ -147,25 +154,11 @@ export default function Register() {
           </div>
           <div className="flex justify-center items-center">
             Already registered?{" "}
-            <Link
-              className="text-indigo-500 ml-1 hover:underline"
-              to="/login"
-            >
+            <Link className="text-indigo-500 ml-1 hover:underline" to="/login">
               Login!
             </Link>{" "}
           </div>
         </form>
-        {submitMessage && (
-          <div
-            className={`mt-4 text-center ${
-              submitMessage.includes("successfully")
-                ? "text-green-600"
-                : "text-red-600"
-            }`}
-          >
-            {submitMessage}
-          </div>
-        )}
       </div>
     </div>
   );
