@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { message } from "antd";
+import { useAuth } from "../../context/AuthContext";
+
 
 export default function Register() {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,6 +17,11 @@ export default function Register() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/about");
+    }
+  }, [isLoggedIn]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -64,7 +72,7 @@ export default function Register() {
           }, 2000);
         }
       } catch (error) {
-        message.error("Registration failed. Please try again.");
+        message.error(error.response?.data?.message);
       } finally {
         setIsSubmitting(false);
       }

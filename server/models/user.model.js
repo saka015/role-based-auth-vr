@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   image: {
     type: String,
@@ -16,14 +17,11 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    minlength: 3,
   },
   is_admin: {
-    type: Number,
+    type: Boolean,
     required: true,
-  },
-  is_verified: {
-    type: Number,
-    default: 0,
   },
 });
 

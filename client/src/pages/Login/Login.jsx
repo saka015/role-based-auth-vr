@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -11,6 +16,12 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/about");
+  //   }
+  // }, [isLoggedIn]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,13 +63,16 @@ export default function Login() {
         if (response.status === 200) {
           console.log("Login successful!");
           message.success("Login successful!");
+
+          navigate("/about");
+
           localStorage.setItem("token", response.data.data.token);
           localStorage.setItem("user", JSON.stringify(response.data.data.user));
           setFormData({ email: "", password: "" });
         }
       } catch (error) {
         console.log(error.response?.data?.message);
-        message.error("Login failed!");
+        message.error(error.response?.data?.message);
       } finally {
         setIsSubmitting(false);
       }
