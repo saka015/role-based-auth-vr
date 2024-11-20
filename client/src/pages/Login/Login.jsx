@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -69,10 +70,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="dot-bg pb-56 min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className=" rounded-xl shadow-xl p-3 bg-white max-w-md w-full space-y-8 py-6">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="txt-gr mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
         </div>
@@ -85,7 +86,7 @@ export default function Login() {
                 type="email"
                 placeholder="Email address"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md my-2 relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-indigo-500 focus:z-10 sm:text-sm"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -100,7 +101,7 @@ export default function Login() {
                 type="password"
                 placeholder="Password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-indigo-500 focus:z-10 sm:text-sm"
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -118,6 +119,9 @@ export default function Login() {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
           </div>
+
+          <div className="flex justify-center items-center">Not registered? <Link className="text-indigo-500 ml-1 hover:underline" to='/register'>Register!</Link> </div>
+
         </form>
         {submitMessage && (
           <div
