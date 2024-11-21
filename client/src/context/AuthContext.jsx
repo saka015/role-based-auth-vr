@@ -1,20 +1,37 @@
+import { message } from "antd";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = () => {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(token ? true : false);
-    };
-    checkSession();
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setUser({ token: storedToken });
+    }
+    setIsLoading(false);
   }, []);
 
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    setUser({ token });
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    message.info("User logged out!");
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

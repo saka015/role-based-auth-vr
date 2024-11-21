@@ -1,53 +1,3 @@
-// import Login from "./pages/Login/Login";
-// import React from "react";
-// import Register from "./pages/Register/Register";
-// import { createBrowserRouter, RouterProvider } from "react-router-dom";
-// import AppLayout from "./components/layout/AppLayout";
-// import Home from "./pages/Home/Home";
-// import AdminDashboard from "./pages/admin/Dashboard/AdminDashboard";
-// import UserDashboard from "./pages/user/Dashboard/UserDashboard";
-// import About from "./pages/Home/About";
-
-// const App = () => {
-//   const router = createBrowserRouter([
-//     {
-//       path: "/",
-//       element: <AppLayout />,
-//       children: [
-//         {
-//           path: "/",
-//           element:<Home/>
-//       },
-//         {
-//           path: "/login",
-//           element: <Login />,
-//         },
-//         {
-//           path: "/register",
-//           element: <Register />,
-//         },
-//         {
-//           path: "/about",
-//           element: <About />,
-//         },
-//         {
-//           path: "/user/dashboard",
-//           element: <UserDashboard />,
-//         }
-//         ,
-//         {
-//           path: "/admin/dashboard",
-//           element: <AdminDashboard />,
-//         },
-//       ],
-//     },
-//   ]);
-
-//   return <RouterProvider router={router} />;
-// };
-
-// export default App;
-
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -58,7 +8,7 @@ import AppLayout from "./components/layout/AppLayout";
 import Home from "./pages/Home/Home";
 import AdminDashboard from "./pages/admin/Dashboard/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard/UserDashboard";
-import About from "./pages/Home/About";
+import About from "./pages/About/About";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -83,9 +33,30 @@ const App = () => {
             </ProtectedRoute>
           ),
         },
-        { path: "/about", element: <About /> },
-        { path: "/user/dashboard", element: <UserDashboard /> },
-        { path: "/admin/dashboard", element: <AdminDashboard /> },
+        {
+          path: "/about",
+          element: (
+            <ProtectedRoute>
+              <About />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/user/dashboard",
+          element: (
+            <ProtectedRoute redirectTo="/login">
+              <UserDashboard />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/dashboard",
+          element: (
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
   ]);

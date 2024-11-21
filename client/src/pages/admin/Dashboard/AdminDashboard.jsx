@@ -1,100 +1,60 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiMenuKebab } from "react-icons/ci";
 import DialogBox from "../../../components/UI/Dialog/DialogBox";
-import { Alert,message } from "antd";
 import Swal from "sweetalert2";
-
-const usersData = [
-  {
-    name: "john doe",
-    date: "4 June, 2024",
-    email: "john.doe@gmail.com",
-    access: "user",
-  },
-  {
-    name: "jane doe",
-    date: "5 June, 2024",
-    email: "test@example.com",
-    access: "admin",
-  },
-  {
-    name: "mark smith",
-    date: "6 June, 2024",
-    email: "mark.smith@example.com",
-    access: "manager",
-  },
-  {
-    name: "lisa jones",
-    date: "7 June, 2024",
-    email: "lisa.jones@example.com",
-    access: "user",
-  },
-  {
-    name: "mike wilson",
-    date: "8 June, 2024",
-    email: "mike.wilson@example.com",
-    access: "admin",
-  },
-  {
-    name: "sarah brown",
-    date: "9 June, 2024",
-    email: "sarah.brown@example.com",
-    access: "manager",
-  },
-  {
-    name: "emma clark",
-    date: "10 June, 2024",
-    email: "emma.clark@example.com",
-    access: "user",
-  },
-  {
-    name: "paul lee",
-    date: "11 June, 2024",
-    email: "paul.lee@example.com",
-    access: "admin",
-  },
-  {
-    name: "anna scott",
-    date: "12 June, 2024",
-    email: "anna.scott@example.com",
-    access: "manager",
-  },
-  {
-    name: "david wright",
-    date: "13 June, 2024",
-    email: "david.wright@example.com",
-    access: "user",
-  },
-];
+import axios from "axios";
 
 const AdminDashboard = () => {
-  const [users, setUsers] = useState(usersData);
-  const [editingEmail, setEditingEmail] = useState(null);
+  const [allUserData, setAllUserData] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [editingId, seteditingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 6;
+  const usersPerPage = 5;
+
+  const getAllUsers = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const response = await axios.get("http://localhost:5000/api/admin", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllUserData(response.data);
+        setUsers(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    } else {
+      console.log("No token found");
+    }
+  };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
 
   const handleEditClick = (email) => {
-    setEditingEmail(editingEmail === email ? null : email);
+    seteditingId(editingId === email ? null : email);
   };
 
-  const handleAccessChange = (email, newAccess) => {
-    const updatedUsers = users.map((user) =>
-      user.email === email ? { ...user, access: newAccess } : user
-    );
-    setUsers(updatedUsers);
-  };
+  // const handleAccessChange = (email, newAccess) => {
+  //   const updatedUsers = users.map((user) =>
+  //     user.email === email ? { ...user, access: newAccess } : user
+  //   );
+  //   setUsers(updatedUsers);
+  // };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Pagination logic
+  // Filtering happens AFTER slicing for pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = allUserData.slice(indexOfFirstUser, indexOfLastUser); // Slice ALLUserData
+
+  const filteredCurrentUsers = currentUsers.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -102,27 +62,70 @@ const AdminDashboard = () => {
 
   const addUser = (newUser) => {
     setUsers((prevUsers) => [...prevUsers, newUser]);
+    setAllUserData((prevUsers) => [...prevUsers, newUser]); //added this
   };
 
- const handleDeleteUser = (email) => {
-   Swal.fire({
-     title: "Are you sure?",
-     text: "You won't be able to revert this!",
-     icon: "warning",
-     showCancelButton: true,
-     confirmButtonColor: "#3085d6",
-     cancelButtonColor: "#d33",
-     confirmButtonText: "Yes, delete it!",
-   }).then((result) => {
-     if (result.isConfirmed) {
-       // Perform delete action here
-       setUsers((prevUsers) =>
-         prevUsers.filter((user) => user.email !== email)
-       );
-       Swal.fire("Deleted!", "The user has been deleted.", "success");
-     }
-   });
- };
+  const handleDeleteUser = async (userId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const token = localStorage.getItem("token");
+          await axios.delete(
+            `http://localhost:5000/api/admin/deleteuser/${userId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+            }
+          );
+          getAllUsers();
+          Swal.fire("Deleted!", "The user has been deleted.", "success");
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete user. Please try again later.",
+          });
+        }
+      }
+    });
+  };
+
+  const handleAccessChange = async (userId, newRole) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        `http://localhost:5000/api/admin/edituser/${userId}`, //Correct URL
+        { role: newRole }, // Send new role in the request body
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.status === 200) {
+        //Check successful update
+        getAllUsers(); //Refresh user list after update
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "User role updated successfully!",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update user role. Please try again later.",
+      });
+    }
+  };
 
   return (
     <div className="dot-bg min-h-screen p-6">
@@ -133,29 +136,27 @@ const AdminDashboard = () => {
         </p>
 
         <div className="flex justify-between items-center mt-12">
-          <h2 className="font-semibold text-xl flex justify-center items-centerd">
+          <h2 className="font-semibold text-xl flex justify-center items-center">
             All Users{" "}
-            <span className="text-gray-400 ml-2">{filteredUsers.length}</span>
+            <span className="text-gray-400 ml-2">{allUserData.length}</span>
           </h2>
           <div className="right flex gap-4">
-            <div className="">
-              <input
-                type="text"
-                name="search"
-                placeholder="Search by name or email..."
-                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button className="bg-indigo-600 hover:bg-indigo-800 active:bg-indigo-400 text-white px-4 py-2 rounded-md">
+            <input
+              type="text"
+              name="search"
+              placeholder="Search by name or email..."
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <div className="bg-indigo-600 hover:bg-indigo-800 active:bg-indigo-400 text-white px-4 py-2 rounded-md">
               <DialogBox name="Add User" onAddUser={addUser} />
-            </button>
+            </div>
           </div>
         </div>
 
         <div className="overflow-x-auto min-h-96">
-          <table className="min-w-full mt-4 ">
+          <table className="min-w-full mt-4">
             <thead>
               <tr className="bg-gray-100 text-center">
                 <th className="px-4 py-2 text-left">Name</th>
@@ -174,48 +175,44 @@ const AdminDashboard = () => {
                   <td className="px-4 py-2">{user.email}</td>
                   <td className="px-4 py-2">{user.date}</td>
                   <td className="px-4 py-2">
-                    {editingEmail === user.email ? (
+                    {editingId === user._id ? (
                       <select
                         className="border rounded text-sm text-center py-1"
-                        value={user.access}
+                        value={user.role} // Use user.role
                         onChange={(e) =>
-                          handleAccessChange(user.email, e.target.value)
+                          handleAccessChange(user._id, e.target.value)
                         }
                       >
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
-                        <option value="manager">Manager</option>
+                        <option value="maintainer">Maintainer</option>
                       </select>
                     ) : (
                       <span
                         className={`w-12 px-1 rounded-lg border font-semibold text-sm capitalize ${
-                          user.access === "user"
+                          user.role === "user"
                             ? "bg-green-100 text-green-700 border-green-700"
-                            : user.access === "admin"
-                            ? "bg-red-100 text-red-700 border-red-700"
-                            : "bg-blue-100 text-blue-700 border-blue-700"
+                            : "bg-red-100 text-red-700 border-red-700"
                         }`}
                       >
-                        {user.access}
+                        {user.role}
                       </span>
                     )}
                   </td>
                   <td className="flex float-right gap-3 px-4 py-2">
                     <button
                       className={`${
-                        editingEmail !== user.email
-                          ? "bg-gray-200"
-                          : "bg-green-200"
-                      }  hover:bg-indigo-200 hover:text-indigo-700 text-gray-600 cursor-pointer py-2 px-6 rounded-sm`}
-                      onClick={() => handleEditClick(user.email)}
+                        editingId !== user._id ? "bg-gray-200" : "bg-green-200"
+                      } hover:bg-indigo-200 hover:text-indigo-700 text-gray-600 cursor-pointer py-2 px-6 rounded-sm`}
+                      onClick={() => handleEditClick(user._id)}
                     >
-                      {editingEmail === user.email ? "Save" : "Edit"}
+                      {editingId === user._id ? "Save" : "Edit"}
                     </button>
                     <button
                       className="bg-red-200 hover:bg-red-300 hover:text-red-700 text-red-600 cursor-pointer py-2 px-6 rounded-sm"
-                      onClick={() => handleDeleteUser(user.email)}
+                      onClick={() => handleDeleteUser(user._id)}
                     >
-                      Delete User
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -232,15 +229,13 @@ const AdminDashboard = () => {
           >
             Prev
           </button>
-
           <span className="px-4 py-2">
-            {currentPage} - {Math.ceil(filteredUsers.length / usersPerPage)}
+            {currentPage} of {Math.ceil(allUserData.length / usersPerPage)}
           </span>
-
           <button
             className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"
             disabled={
-              currentPage === Math.ceil(filteredUsers.length / usersPerPage)
+              currentPage === Math.ceil(allUserData.length / usersPerPage)
             }
             onClick={() => handlePageChange(currentPage + 1)}
           >
