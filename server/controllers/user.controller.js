@@ -68,6 +68,13 @@ const loginUser = async (req, res) => {
         .json({ status: "fail", message: "User not found" });
     }
 
+    if (user.status === "inactive") {
+      return res.status(401).json({
+        status: "fail",
+        message: "User is inactive. Please contact your admin!",
+      });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res
@@ -88,7 +95,7 @@ const loginUser = async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
-          is_admin: user.is_admin,
+          role: user.role,
         },
         token,
       },
@@ -148,6 +155,15 @@ const deleteUser = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
+
+    // const { email } = req.body;
+    // const user = await User.findOne({ email });
+    // if (user?.role !== "admin") {
+    //   return res
+    //     .status(404)
+    //     .json({ status: "fail", message: "You are not authorized" });
+    // }
+
     res
       .status(200)
       .json({ success: true, message: "User deleted successfully" });
@@ -159,32 +175,42 @@ const deleteUser = async (req, res) => {
 
 const editUser = async (req, res) => {
   try {
-    const userId = req.params.id; // Assuming you're passing userId as a route parameter
-    const { role } = req.body; // Extract the new role from the request body
+    const { id: userId } = req.params; // Destructure userId from params
+    const { role, status } = req.body; // Destructure role and status from body
 
-    //Input Validation (add more as needed):
-    if (!userId || !role) {
-      return res.status(400).json({ error: "Missing userId or role" });
+    // Input Validation
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+    if (!role && !status) {
+      return res.status(400).json({
+        error: "Provide at least one field to update: role or status",
+      });
     }
 
-    // Find and update the user
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true } //Return updated document
-    );
+    // Prepare update data dynamically
+    const updateData = {};
+    if (role) updateData.role = role;
+    if (status) updateData.status = status;
+
+    // Update user and return updated data
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "User role updated successfully", user: updatedUser });
+    return res.json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
-    console.error("Error updating user role:", error.stack);
+    console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 module.exports = {
   loginUser,

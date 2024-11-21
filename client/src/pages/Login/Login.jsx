@@ -156,6 +156,8 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { loggedUser } = useAuth();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -169,40 +171,6 @@ export default function Login() {
     if (!formData.password) formErrors.password = "Password is required";
     return formErrors;
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const formErrors = validateForm();
-  //   if (Object.keys(formErrors).length === 0) {
-  //     setIsSubmitting(true);
-  //     setErrors({});
-  //     try {
-  //       const response = await axios.post(
-  //         "http://localhost:5000/api/login",
-  //         formData,
-  //         {
-  //           headers: { "Content-Type": "application/json" },
-  //         }
-  //       );
-  //       if (response.status === 200) {
-  //         message.success("Login successful!");
-  //         login(response.data.data.token);
-
-  //         console.log("response", response.data.data.user);
-  //         navigate("/about");
-  //         setFormData({ email: "", password: "" });
-  //       } else {
-  //         message.error(response.data.message || "Login failed");
-  //       }
-  //     } catch (error) {
-  //       message.error(error.response?.data?.message || "Login failed");
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   } else {
-  //     setErrors(formErrors);
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -226,7 +194,14 @@ export default function Login() {
           localStorage.setItem("token", token);
           localStorage.setItem("user", JSON.stringify(user));
 
-          navigate("/user/dashboard"); // Navigate to the user page
+          console.log("login : ", user.role);
+
+          if (user?.role === "user") {
+            navigate("/user/dashboard");
+          } else {
+            navigate("/admin/dashboard");
+          }
+
           setFormData({ email: "", password: "" });
         } else {
           message.error(response.data.message || "Login failed");

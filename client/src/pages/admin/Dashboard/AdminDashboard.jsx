@@ -1,27 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { CiMenuKebab } from "react-icons/ci";
 import DialogBox from "../../../components/UI/Dialog/DialogBox";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [allUserData, setAllUserData] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [editingId, seteditingId] = useState(null);
+  const [editingUser, setEditingUser] = useState(null); // Track the whole user object being edited
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingStatus, setEditingStatus] = useState(null); // New state for editing status
+  const [editingRole, setEditingRole] = useState(null);
   const usersPerPage = 5;
+
+  const { loggedUser } = useAuth();
+  // console.log("onadmiin", loggedUser.email);
 
   const getAllUsers = async () => {
     const token = localStorage.getItem("token");
+
     if (token) {
       try {
         const response = await axios.get("http://localhost:5000/api/admin", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAllUserData(response.data);
-        setUsers(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -31,29 +37,23 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    if (loggedUser?.role === "user") {
+      message.warning("You are not authorized to access this page.");
+      navigate("/");
+    }
+
     getAllUsers();
   }, []);
 
-  const handleEditClick = (email) => {
-    seteditingId(editingId === email ? null : email);
-  };
-
-  // const handleAccessChange = (email, newAccess) => {
-  //   const updatedUsers = users.map((user) =>
-  //     user.email === email ? { ...user, access: newAccess } : user
-  //   );
-  //   setUsers(updatedUsers);
-  // };
-
-  // Filtering happens AFTER slicing for pagination
+  // Pagination and Filtering
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = allUserData.slice(indexOfFirstUser, indexOfLastUser); // Slice ALLUserData
+  const currentUsers = allUserData.slice(indexOfFirstUser, indexOfLastUser);
 
-  const filteredCurrentUsers = currentUsers.filter(
+  const filteredUsers = currentUsers.filter(
     (user) =>
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handlePageChange = (page) => {
@@ -61,8 +61,7 @@ const AdminDashboard = () => {
   };
 
   const addUser = (newUser) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-    setAllUserData((prevUsers) => [...prevUsers, newUser]); //added this
+    setAllUserData([...allUserData, newUser]);
   };
 
   const handleDeleteUser = async (userId) => {
@@ -81,13 +80,13 @@ const AdminDashboard = () => {
           await axios.delete(
             `http://localhost:5000/api/admin/deleteuser/${userId}`,
             {
-              headers: { Authorization: `Bearer ${token}` }, // Add authorization header
+              headers: { Authorization: `Bearer ${token}` },
             }
           );
           getAllUsers();
           Swal.fire("Deleted!", "The user has been deleted.", "success");
         } catch (error) {
-          console.error("Error deleting user:", error);
+          console.error("Error deleting user:", error.message);
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -98,31 +97,34 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleAccessChange = async (userId, newRole) => {
+  const handleEditClick = (user) => {
+    setEditingUser(editingUser === user ? null : user);
+    setEditingStatus(editingUser === user ? null : user.status); //Initialize status state
+    setEditingRole(editingUser === user ? null : user.role); //Initialize role state
+  };
+
+  const handleSaveEdit = async (user) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/edituser/${userId}`, //Correct URL
-        { role: newRole }, // Send new role in the request body
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const updatedUser = { ...user, status: editingStatus, role: editingRole };
+      await axios.put(
+        `http://localhost:5000/api/admin/edituser/${user._id}`,
+        { role: editingRole, status: editingStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (response.status === 200) {
-        //Check successful update
-        getAllUsers(); //Refresh user list after update
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "User role updated successfully!",
-        });
-      }
+      getAllUsers();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "User updated successfully!",
+      });
+      setEditingUser(null); // Reset editing state
     } catch (error) {
-      console.error("Error updating user role:", error);
+      console.error("Error updating user:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update user role. Please try again later.",
+        text: "Failed to update user. Please try again later.",
       });
     }
   };
@@ -130,7 +132,19 @@ const AdminDashboard = () => {
   return (
     <div className="dot-bg min-h-screen p-6">
       <div className="bg-white p-4 px-10 rounded-xl shadow-lg">
-        <h1 className="pt-6 text-2xl font-semibold">User Management</h1>
+        <div className="flex justify-between gap-6">
+          <h1 className="mt-6 text-2xl font-semibold p-2">User Management</h1>
+
+          {loggedUser?.role !== "admin" ? (
+            <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-blue-300 capitalize text-blue-800 border-blue-800">
+              {loggedUser?.role}
+            </h1>
+          ) : (
+            <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-red-300 capitalize text-red-800 border-red-800">
+              {loggedUser?.role}
+            </h1>
+          )}
+        </div>
         <p className="text-gray-500">
           Manage your users and their account permissions here.
         </p>
@@ -161,27 +175,44 @@ const AdminDashboard = () => {
               <tr className="bg-gray-100 text-center">
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Date Added</th>
+                <th className="px-4 py-2 text-left">Status</th>
                 <th className="px-4 py-2 text-left">Access</th>
-                <th className="px-4 py-2 text-left float-right mr-28">
-                  Actions
-                </th>
+                <th className="px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {currentUsers.map((user) => (
-                <tr key={user.email} className="bg-gray-50">
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="bg-gray-50">
                   <td className="px-4 py-2">{user.name}</td>
                   <td className="px-4 py-2">{user.email}</td>
-                  <td className="px-4 py-2">{user.date}</td>
                   <td className="px-4 py-2">
-                    {editingId === user._id ? (
+                    {editingUser === user ? (
                       <select
+                        value={editingStatus || user.status} // Use editingStatus or default value
+                        onChange={(e) => setEditingStatus(e.target.value)}
                         className="border rounded text-sm text-center py-1"
-                        value={user.role} // Use user.role
-                        onChange={(e) =>
-                          handleAccessChange(user._id, e.target.value)
-                        }
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    ) : (
+                      <span
+                        className={`capitalize font-semibold ${
+                          user.status === "active"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {user.status}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {editingUser === user ? (
+                      <select
+                        value={editingRole || user.role} //Use editingRole or default value
+                        onChange={(e) => setEditingRole(e.target.value)}
+                        className="border rounded text-sm text-center py-1"
                       >
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
@@ -189,32 +220,55 @@ const AdminDashboard = () => {
                       </select>
                     ) : (
                       <span
-                        className={`w-12 px-1 rounded-lg border font-semibold text-sm capitalize ${
+                        className={`w-12 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
                           user.role === "user"
                             ? "bg-green-100 text-green-700 border-green-700"
-                            : "bg-red-100 text-red-700 border-red-700"
+                            : user.role === "admin"
+                            ? "bg-red-100 text-red-700 border-red-700"
+                            : user.role === "maintainer"
+                            ? "bg-blue-100 text-blue-700 border-blue-700"
+                            : ""
                         }`}
                       >
                         {user.role}
                       </span>
                     )}
                   </td>
-                  <td className="flex float-right gap-3 px-4 py-2">
-                    <button
-                      className={`${
-                        editingId !== user._id ? "bg-gray-200" : "bg-green-200"
-                      } hover:bg-indigo-200 hover:text-indigo-700 text-gray-600 cursor-pointer py-2 px-6 rounded-sm`}
-                      onClick={() => handleEditClick(user._id)}
-                    >
-                      {editingId === user._id ? "Save" : "Edit"}
-                    </button>
-                    <button
-                      className="bg-red-200 hover:bg-red-300 hover:text-red-700 text-red-600 cursor-pointer py-2 px-6 rounded-sm"
-                      onClick={() => handleDeleteUser(user._id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {loggedUser?.email === user.email ? null : (
+                    <td className="px-4 py-2">
+                      {editingUser === user ? (
+                        <>
+                          <button
+                            className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
+                            onClick={() => handleSaveEdit(user)}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-1 px-3 rounded"
+                            onClick={() => handleEditClick(user)}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                          onClick={() => handleEditClick(user)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {loggedUser?.role === "admin" ? (
+                        <button
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"
+                          onClick={() => handleDeleteUser(user._id)}
+                        >
+                          Delete
+                        </button>
+                      ) : null}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

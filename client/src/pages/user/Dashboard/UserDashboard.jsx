@@ -57,17 +57,39 @@ const UserDashboard = () => {
     }
   }, [user]);
 
-  const role = user?.is_admin ? "Admin" : "User";
+  // const role = user?.is_admin ? "Admin" : "User";
 
   return (
     <div className="dot-bg min-h-screen flex flex-col pt-36 items-center">
-      <div className=" rounded-xl bg-indigo-100 shadow-xl p-8 max-w-md w-full">
-        <h1>Name : {user?.name}</h1>
-        <h1>Email : {user?.email}</h1>
-        <h1>Role : {role}</h1>
-        <button onClick={logoutUser} className="bg-red-400 w-full py-3 ">
+      <div className="min-h-96 min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">
+        <span
+          className={`float-right w-12 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
+            user.role === "user"
+              ? "bg-green-100 text-green-700 border-green-700"
+              : user.role === "admin"
+              ? "bg-red-100 text-red-700 border-red-700"
+              : user.role === "maintainer"
+              ? "bg-blue-100 text-blue-700 border-blue-700"
+              : ""
+          }`}
+        >
+          {user.role}
+        </span>
+        <div className=" h-96 w-88 ml-8 flex flex-col justify-center items-center">
+          <h1 className="text-3xl flex flex-col text-center">
+            Welcome{" "}
+            <span className="text-indigo-600 text-5xl font-semibold">
+              {user?.name}!
+            </span>
+          </h1>
+        </div>
+        {/* <h1>Email : {user?.email}</h1> */}
+        {/* <button
+          onClick={logoutUser}
+          className="mt-36 bg-red-100 rounded-lg border text-center font-semibold text-sm capitalize text-red-700 border-red-700 w-full py-3 "
+        >
           Logout
-        </button>
+        </button> */}
       </div>
     </div>
   );
