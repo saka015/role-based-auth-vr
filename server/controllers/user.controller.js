@@ -1,10 +1,15 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
-const bcrypt = require("bcrypt");
-const { body, validationResult } = require("express-validator");
-const { get } = require("mongoose");
+import jwt from "jsonwebtoken";
+import { fileURLToPath } from "url";
+import User from "../models/user.model.js";
+import ejs from "ejs";
+import path from "path";
 
-// const sendMail = require("../utils/SendEmail");
+import bcrypt from "bcrypt";
+import { body, validationResult } from "express-validator";
+import sendMail from "../utils/SendEmail.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const hashedPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
@@ -214,6 +219,9 @@ const editUser = async (req, res) => {
   }
 };
 
+const generateRandomPassword = () => {
+  return Math.random().toString(36).slice(-6); // Generates a random 6-character password
+};
 
 const adminCreateUser = async (req, res) => {
   try {
@@ -236,8 +244,10 @@ const adminCreateUser = async (req, res) => {
       });
     }
 
-    // Generate and hash the temporary password
-    const temporaryPassword = "123456";
+    // Generate a random 6-character password
+    const temporaryPassword = generateRandomPassword();
+    console.log("Temporary Password:", temporaryPassword);
+    console.log("Email to : ", email);
     const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
 
     // Create and save the new user
@@ -251,9 +261,36 @@ const adminCreateUser = async (req, res) => {
 
     const savedUser = await newUser.save();
 
+    // Prepare the email data
+    const emailData = {
+      name: name,
+      password: temporaryPassword,
+    };
+
+    const html = await ejs.renderFile(
+      path.join(__dirname, "../mails/temporaryPassword.ejs"),
+      emailData
+    );
+
+    try {
+      await sendMail({
+        email: email,
+        subject: "Your Account Credentials",
+        template: "temporaryPassword.ejs", // Use your EJS template for email
+        data: emailData,
+      });
+    } catch (mailError) {
+      console.error("Error sending email:", mailError);
+      return res.status(500).json({
+        status: "fail",
+        message: "Error sending email. Please try again later.",
+        error: mailError.message,
+      });
+    }
+
     return res.status(201).json({
       status: "success",
-      message: "User created successfully!",
+      message: "User created successfully! Temporary password sent to email.",
       data: savedUser,
     });
   } catch (error) {
@@ -265,7 +302,7 @@ const adminCreateUser = async (req, res) => {
     });
   }
 };
-module.exports = {
+export default {
   loginUser,
   createUser,
   getUserData,
@@ -281,3 +318,11 @@ module.exports = {
     body("name").notEmpty().withMessage("Name is required"),
   ],
 };
+
+export const createUserValidation = [
+  body("email").isEmail().withMessage("Please provide a valid email address"),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("name").notEmpty().withMessage("Name is required"),
+];

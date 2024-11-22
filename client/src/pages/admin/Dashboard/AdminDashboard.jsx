@@ -241,7 +241,9 @@ const AdminDashboard = () => {
                       </span>
                     )}
                   </td>
-                  {loggedUser?.email === user.email ? null : (
+                  {loggedUser?.email === user.email ? (
+                    <td className="text-red-400 uppercase pl-3 pt-1 font-semibold">not authorised</td>
+                  ) : (
                     <td className="px-4 py-2">
                       {editingUser === user ? (
                         <>
@@ -273,7 +275,9 @@ const AdminDashboard = () => {
                         >
                           Delete
                         </button>
-                      ) : null}
+                      ) : (
+                        ""
+                      )}
                     </td>
                   )}
                 </tr>

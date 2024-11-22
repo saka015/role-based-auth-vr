@@ -1,8 +1,8 @@
-const express = require("express");
-const multer = require("multer");
-const path = require("path");
-const auth = require("../middlewares/auth");
-const userController = require("../controllers/user.controller");
+import express from "express";
+import multer from "multer";
+import path from "path";
+import auth from "../middlewares/auth.js";
+import userController from "../controllers/user.controller.js";
 
 const userRoute = express.Router();
 
@@ -50,4 +50,5 @@ userRoute.post(
 
 userRoute.put("/admin/edituser/:id", auth.isLoggedIn, userController.editUser);
 
-module.exports = userRoute;
+// module.exports = userRoute;
+export default userRoute;

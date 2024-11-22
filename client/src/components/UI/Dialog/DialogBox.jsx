@@ -48,6 +48,7 @@ const DialogBox = ({ name, onAddUser }) => {
       onAddUser(response.data);
       Swal.fire("Success", "User added successfully!", "success");
       setFormData({ name: "", email: "", role: "user" });
+      window.location.reload();
     } catch (error) {
       console.error("Error creating user:", error);
       Swal.fire(
@@ -73,7 +74,7 @@ const DialogBox = ({ name, onAddUser }) => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-30" />
         <Dialog.Content
-          className="z-100 fixed bg-red-400 p-6 rounded-lg shadow-lg w-[90%] max-w-md top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          className="z-100 fixed bg-indigo-100 p-6 rounded-lg shadow-lg w-[90%] max-w-md top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
         >
           <Dialog.Title className="text-xl font-bold">Add User</Dialog.Title>
