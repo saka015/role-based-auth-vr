@@ -1,9 +1,36 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
   const { logout, user, loggedUser } = useAuth();
+  const navigate = useNavigate();
+
+  if (loggedUser) {
+    // navigate("/");
+    var cnt = 0;
+    if (cnt < 0) {
+      window.location.reload();
+      cnt++;
+    }
+  }
+
+  useEffect(() => {
+    if (loggedUser) {
+      // navigate("/");
+      var cnt = 0;
+      if (cnt < 0) {
+        window.location.reload();
+        cnt++;
+      }
+    }
+
+    if (!loggedUser) {
+      navigate("/");
+    }
+  }, [loggedUser, user?.token, window.location.pathname]);
+
+  console.log("loggedUser", loggedUser?.role);
 
   return (
     <div className="min-h-screen w-full p-10">
@@ -36,7 +63,8 @@ const Home = () => {
                   User Dashboard
                 </button>
               </Link>
-              {loggedUser?.role === "admin" && (
+              {(loggedUser?.role === "admin" ||
+                loggedUser?.role === "maintainer") && (
                 <Link to="/admin/dashboard">
                   <button className="px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
                     Admin Dashboard

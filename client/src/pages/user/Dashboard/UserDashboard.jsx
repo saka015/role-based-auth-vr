@@ -1,28 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { message } from "antd";
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, loggedUser } = useAuth();
 
   const userLoggedIn = localStorage.getItem("token");
-
-  const logoutUser = () => {
-    logout();
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
-  };
-
-  // useEffect(() => {
-  //   if (!userLoggedIn) {
-  //     navigate("/");
-  //   }
-  // }, userLoggedIn);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -52,28 +39,31 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!userLoggedIn) {
       message.error("User not found");
-      // logoutUser();
-      // navigate("/");
     }
   }, [user]);
 
-  // const role = user?.is_admin ? "Admin" : "User";
 
+  useEffect(() => {
+    if (!loggedUser) {
+      message.warning("Please login to access this page.");
+      navigate("/");
+    }
+  }, []);
   return (
     <div className="dot-bg min-h-screen flex flex-col pt-36 items-center">
       <div className="min-h-96 min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">
         <span
-          className={`float-right w-12 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
-            user.role === "user"
+          className={`float-right max-w-20 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
+            user?.role === "user"
               ? "bg-green-100 text-green-700 border-green-700"
-              : user.role === "admin"
+              : user?.role === "admin"
               ? "bg-red-100 text-red-700 border-red-700"
-              : user.role === "maintainer"
+              : user?.role === "maintainer"
               ? "bg-blue-100 text-blue-700 border-blue-700"
               : ""
           }`}
         >
-          {user.role}
+          {user?.role}
         </span>
         <div className=" h-96 w-88 ml-8 flex flex-col justify-center items-center">
           <h1 className="text-3xl flex flex-col text-center">

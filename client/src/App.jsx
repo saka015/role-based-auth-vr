@@ -1,14 +1,12 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./pages/ProtectedRoutes/ProtectedRoutes";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import AppLayout from "./components/layout/AppLayout";
 import Home from "./pages/Home/Home";
 import AdminDashboard from "./pages/admin/Dashboard/AdminDashboard";
 import UserDashboard from "./pages/user/Dashboard/UserDashboard";
-import About from "./pages/About/About";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -19,43 +17,19 @@ const App = () => {
         { path: "/", element: <Home /> },
         {
           path: "/login",
-          element: (
-            <ProtectedRoute redirectTo="/user/dashboard">
-              <Login />
-            </ProtectedRoute>
-          ),
+          element: <Login />,
         },
         {
           path: "/register",
-          element: (
-            <ProtectedRoute redirectTo="/user/dashboard">
-              <Register />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/about",
-          element: (
-            <ProtectedRoute>
-              <About />
-            </ProtectedRoute>
-          ),
+          element: <Register />,
         },
         {
           path: "/user/dashboard",
-          element: (
-            <ProtectedRoute redirectTo="/login">
-              <UserDashboard />
-            </ProtectedRoute>
-          ),
+          element: <UserDashboard />,
         },
         {
           path: "/admin/dashboard",
-          element: (
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          ),
+          element: <AdminDashboard />,
         },
       ],
     },

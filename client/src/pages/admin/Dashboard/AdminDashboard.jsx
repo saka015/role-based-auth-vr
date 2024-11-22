@@ -37,6 +37,11 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    if (!loggedUser) {
+      message.warning("Please login to access this page.");
+      navigate("/");
+    }
+
     if (loggedUser?.role === "user") {
       message.warning("You are not authorized to access this page.");
       navigate("/");
@@ -215,7 +220,9 @@ const AdminDashboard = () => {
                         className="border rounded text-sm text-center py-1"
                       >
                         <option value="user">User</option>
-                        <option value="admin">Admin</option>
+                        {loggedUser?.role === "admin" && (
+                          <option value="admin">Admin</option>
+                        )}
                         <option value="maintainer">Maintainer</option>
                       </select>
                     ) : (

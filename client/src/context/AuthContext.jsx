@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loggedUser, setLoggedUser] = useState(null);
 
-
   useEffect(() => {
     const fetchUserData = async () => {
       const storedToken = localStorage.getItem("token");
@@ -50,7 +49,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen min-w-screen flex justify-center items-start">
+        <h1> Loading...</h1>
+      </div>
+    );
   }
 
   return (
