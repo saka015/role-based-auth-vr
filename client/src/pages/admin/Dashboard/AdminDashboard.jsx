@@ -57,8 +57,8 @@ const AdminDashboard = () => {
 
   const filteredUsers = currentUsers.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      user.name?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery?.toLowerCase())
   );
 
   const handlePageChange = (page) => {

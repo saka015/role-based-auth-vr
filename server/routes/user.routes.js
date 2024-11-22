@@ -42,6 +42,11 @@ userRoute.delete(
   auth.isLoggedIn,
   userController.deleteUser
 );
+userRoute.post(
+  "/admin/createuser",
+  auth.isLoggedIn,
+  userController.adminCreateUser
+);
 
 userRoute.put("/admin/edituser/:id", auth.isLoggedIn, userController.editUser);
 

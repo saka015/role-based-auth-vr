@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const { get } = require("mongoose");
 
+// const sendMail = require("../utils/SendEmail");
+
 const hashedPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
@@ -212,6 +214,57 @@ const editUser = async (req, res) => {
   }
 };
 
+
+const adminCreateUser = async (req, res) => {
+  try {
+    const { email, name, role } = req.body;
+
+    // Validate input
+    if (!email || !name) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Name and email are required.",
+      });
+    }
+
+    // Check if user with the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        status: "fail",
+        message: "User with this email already exists.",
+      });
+    }
+
+    // Generate and hash the temporary password
+    const temporaryPassword = "123456";
+    const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
+    // Create and save the new user
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || "user", // Default to 'user' role if not provided
+      image: null, // Explicitly set image to null
+    });
+
+    const savedUser = await newUser.save();
+
+    return res.status(201).json({
+      status: "success",
+      message: "User created successfully!",
+      data: savedUser,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Internal server error",
+      error: error.message, // Include error message for debugging
+    });
+  }
+};
 module.exports = {
   loginUser,
   createUser,
@@ -219,6 +272,7 @@ module.exports = {
   getAllUser,
   deleteUser,
   editUser,
+  adminCreateUser,
   createUserValidation: [
     body("email").isEmail().withMessage("Please provide a valid email address"),
     body("password")
