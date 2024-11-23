@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import userRoute from "./routes/user.routes.js";
+import { setupDatabase } from "./db/db.js";
+import { seedUser } from "./models/user.model.js";
 
 dotenv.config();
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// mongodbConnect();
+setupDatabase();
+seedUser();
 
 const app = express();
 app.use(cors());

@@ -5,43 +5,15 @@ import { useAuth } from "../../../context/AuthContext";
 import { message } from "antd";
 
 const UserDashboard = () => {
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { logout, loggedUser } = useAuth();
 
-  const userLoggedIn = localStorage.getItem("token");
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        try {
-          // Sending a GET request with Authorization header containing JWT token
-          const response = await axios.get("http://localhost:5000/api/user", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setUser(response.data); // Update user data
-        } catch (error) {
-          console.log(
-            "Error fetching user data:",
-            error.response?.data || error
-          );
-        }
-      } else {
-        console.log("No token found");
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (!userLoggedIn) {
+    if (!loggedUser) {
       message.error("User not found");
+      navigate("/");
     }
-  }, [user]);
-
+  }, [navigate]);
 
   useEffect(() => {
     if (!loggedUser) {
@@ -54,22 +26,18 @@ const UserDashboard = () => {
       <div className="min-h-96 min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">
         <span
           className={`float-right max-w-20 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
-            user?.role === "user"
+            loggedUser?.role.permissions.delete !== true
               ? "bg-green-100 text-green-700 border-green-700"
-              : user?.role === "admin"
-              ? "bg-red-100 text-red-700 border-red-700"
-              : user?.role === "maintainer"
-              ? "bg-blue-100 text-blue-700 border-blue-700"
-              : ""
+              : "bg-red-100 text-red-700 border-red-700"
           }`}
         >
-          {user?.role}
+          {loggedUser?.role.name}
         </span>
         <div className=" h-96 w-88 ml-8 flex flex-col justify-center items-center">
           <h1 className="text-3xl flex flex-col text-center">
             Welcome{" "}
             <span className="text-indigo-600 text-5xl font-semibold">
-              {user?.name}!
+              {loggedUser?.name}!
             </span>
           </h1>
         </div>

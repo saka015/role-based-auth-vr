@@ -3,8 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
-  const { logout, user, loggedUser } = useAuth();
   const navigate = useNavigate();
+  const {
+    logout,
+    user,
+    loggedUser,
+    statusAuth,
+    accessAuth,
+    editAuth,
+    deleteAuth,
+  } = useAuth();
 
   if (loggedUser) {
     // navigate("/");
@@ -63,8 +71,13 @@ const Home = () => {
                   User Dashboard
                 </button>
               </Link>
-              {(loggedUser?.role === "admin" ||
-                loggedUser?.role === "maintainer") && (
+              {/* { (accessAuth || editAuth || deleteAuth) && (
+                <Link to="/admin/dashboard">
+                  <button className="px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
+                    Admin Dashboard
+                  </button>)} */}
+
+              {(accessAuth || editAuth || deleteAuth) && (
                 <Link to="/admin/dashboard">
                   <button className="px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
                     Admin Dashboard

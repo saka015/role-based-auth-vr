@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -25,11 +25,35 @@ export const userSchema = new mongoose.Schema({
     minlength: 3,
   },
   role: {
-    type: String,
-    enum: ["user", "admin", "maintainer"],
-    default: "user",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Role",
+    default: null,
   },
 });
 
-// Export the model
-export default mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;
+
+import bcrypt from "bcrypt";
+import { Role } from "./role.model.js";
+export const seedUser = async () => {
+  try {
+    const existingUser = await User.findOne({ email: "admin@gmail.com" });
+
+    const findAdmin = await Role.findOne({ name: "admin" });
+
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash("admin@123", 10);
+      const user = new User({
+        name: "Admin",
+        email: "admin@gmail.com",
+        password: hashedPassword,
+        role: findAdmin._id,
+      });
+      await user.save();
+      console.log("Seeded user: Admin");
+    }
+  } catch (error) {
+    console.error("Error seeding user:", error);
+  }
+};

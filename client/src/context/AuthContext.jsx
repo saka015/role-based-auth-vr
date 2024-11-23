@@ -8,31 +8,60 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loggedUser, setLoggedUser] = useState(null);
+  const [allRoles, setAllRoles] = useState([]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setUser({ token: storedToken });
+  // fetching all users
+  const fetchUserData = async () => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setUser({ token: storedToken });
 
-        try {
-          const response = await axios.get("http://localhost:5000/api/user", {
-            headers: { Authorization: `Bearer ${storedToken}` },
-          });
-          setLoggedUser(response.data); // Update user data
-        } catch (error) {
-          console.error(
-            "Error fetching user data:",
-            error.response?.data || error
-          );
-          logout(); // Logout user if token is invalid
-        }
+      try {
+        const response = await axios.get("http://localhost:5000/api/user", {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+        setLoggedUser(response.data); // Update user data
+      } catch (error) {
+        console.error(
+          "Error fetching user data:",
+          error.response?.data || error
+        );
+        logout(); // Logout user if token is invalid
       }
-      setIsLoading(false);
-    };
+    }
+    setIsLoading(false);
+  };
 
-    fetchUserData();
-  }, []);
+  // fetching all roles
+  const getAllRoles = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const allRoles = await axios.get(
+          "http://localhost:5000/api/admin/getallroles",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setAllRoles(allRoles.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    } else {
+      console.log("No token found");
+    }
+  };
+
+  // permissions
+
+  // console.log("loggedUser", loggedUser?.role.permissions.status);
+
+  const statusAuth = loggedUser?.role.permissions.status;
+  const accessAuth = loggedUser?.role.permissions.access;
+  const editAuth = loggedUser?.role.permissions.edit;
+  const deleteAuth = loggedUser?.role.permissions.delete;
+
+  // console.log(statusAuth, accessAuth, editAuth, deleteAuth);
 
   const login = (token) => {
     localStorage.setItem("token", token);
@@ -48,6 +77,11 @@ export const AuthProvider = ({ children }) => {
     window.location.href = "/";
   };
 
+  useEffect(() => {
+    fetchUserData();
+    getAllRoles();
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen min-w-screen flex justify-center items-start">
@@ -56,8 +90,22 @@ export const AuthProvider = ({ children }) => {
     );
   }
 
+  // if(loggedUser)
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loggedUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        loggedUser,
+        statusAuth,
+        accessAuth,
+        editAuth,
+        deleteAuth,
+        allRoles,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

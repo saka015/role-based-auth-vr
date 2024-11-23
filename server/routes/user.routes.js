@@ -49,6 +49,20 @@ userRoute.post(
 );
 
 userRoute.put("/admin/edituser/:id", auth.isLoggedIn, userController.editUser);
+userRoute.post("/admin/addrole", auth.isLoggedIn, userController.adminAddRole);
+userRoute.get(
+  "/admin/getallroles",
+  auth.isLoggedIn,
+  userController.getAllRole
+);
+userRoute.put("/admin/editrole/:id", auth.isLoggedIn, userController.editRole);
+userRoute.delete(
+  "/admin/deleterole/:id",
+  auth.isLoggedIn,
+  userController.deleteRole
+);
+
+
 
 // module.exports = userRoute;
 export default userRoute;

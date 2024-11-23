@@ -51,6 +51,7 @@ export default function Register() {
         setFormData({ name: "", email: "", password: "" });
         navigate("/login");
       } catch (error) {
+        console.error("Error registering user:", error);
         message.error(error.response?.data?.message);
       } finally {
         setIsSubmitting(false);
