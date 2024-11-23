@@ -99,27 +99,6 @@ const UserManagement = () => {
     setEditingRole(editingUser === user ? null : user.role?.name);
   };
 
-  // const handleSaveEdit = async (user) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const updatedUser = { ...user, status: editingStatus, role: editingRole };
-  //     await axios.put(
-  //       `http://localhost:5000/api/admin/edituser/${user._id}`,
-  //       { role: editingRole, status: editingStatus },
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-  //     getAllUsers();
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Success",
-  //       text: "User updated successfully!",
-  //     });
-  //     setEditingUser(null);
-  //   } catch (error) {
-  //     console.error("Error updating user:", error);
-  //     message.error("Failed to update user. Please try again later.");
-  //   }
-  // };
 
    const handleSaveEdit = async (user) => {
      try {
@@ -127,7 +106,7 @@ const UserManagement = () => {
        const updatedUser = { ...user, status: editingStatus }; //editingRole removed because of backend
        const role = allRoleData.find((role) => role.name === editingRole);
 
-       //Important: update the role using ID if it's selected
+
 
        if (role) updatedUser.role = role._id;
 

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { message } from "antd";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
+  const { loggedUser } = useAuth();
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -60,6 +63,13 @@ export default function Register() {
       setErrors(formErrors);
     }
   };
+
+    useEffect(() => {
+      if (loggedUser) {
+        navigate("/");
+        message.info("You are already logged in.");
+      }
+    }, [loggedUser, navigate]);
 
   return (
     <div className="dot-bg min-h-screen pb-44 bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

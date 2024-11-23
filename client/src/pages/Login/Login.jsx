@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { message } from "antd";
@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,6 +78,13 @@ export default function Login() {
       setErrors(formErrors);
     }
   };
+
+  useEffect(() => {
+    if (loggedUser) {
+      navigate("/");
+      message.info("You are already logged in.");
+    }
+  }, [loggedUser, navigate]);
 
   return (
     <div className="dot-bg pb-56 min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">

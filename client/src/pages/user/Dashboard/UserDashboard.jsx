@@ -10,17 +10,12 @@ const UserDashboard = () => {
 
   useEffect(() => {
     if (!loggedUser) {
-      message.error("User not found");
+      message.error("You are not logged in.");
       navigate("/");
+      return;
     }
-  }, [navigate]);
+  }, [loggedUser, navigate]);
 
-  useEffect(() => {
-    if (!loggedUser) {
-      message.warning("Please login to access this page.");
-      navigate("/");
-    }
-  }, []);
   return (
     <div className="dot-bg min-h-screen flex flex-col pt-36 items-center">
       <div className="min-h-96 min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">

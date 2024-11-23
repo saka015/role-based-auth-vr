@@ -16,13 +16,6 @@ const AdminDashboard = () => {
   const { loggedUser, statusAuth, accessAuth, editAuth, deleteAuth } =
     useAuth();
 
-  // if (!accessAuth && !editAuth && !deleteAuth) {
-  //   navigate("/");
-  //   message.error("You don't have access to this page. Contact admin.");
-  // }
-
-  // if()
-
   useEffect(() => {
     if (!loggedUser) {
       message.warning("Please login to access this page.");
