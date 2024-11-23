@@ -132,12 +132,12 @@ const UserManagement = () => {
     <div className="bg-white p-4 px-10 rounded shadow-lg">
       <div className="flex justify-between gap-6">
         <h1 className="mt-6 text-2xl font-semibold p-2">User Management</h1>
-        {loggedUser?.role.permissions.delete ? (
-          <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-red-300 capitalize text-red-800 border-red-800">
+        {loggedUser?.role.name !== "admin" ? (
+          <h1 className="mt-6 text-sm sm:text-2xl font-semibold rounded-lg p-2 border bg-blue-300 capitalize text-blue-800 border-blue-800">
             {loggedUser?.role.name}
           </h1>
         ) : (
-          <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-blue-300 capitalize text-blue-800 border-red-800">
+          <h1 className="mt-6 h-10 sm:full flex justify-center items-center text-sm sm:text-2xl font-semibold rounded-lg p-2 border bg-red-300 capitalize text-red-800 border-red-800">
             {loggedUser?.role.name}
           </h1>
         )}
@@ -146,12 +146,14 @@ const UserManagement = () => {
         Manage your users and their account permissions here.
       </p>
 
-      <div className="flex justify-between items-center mt-12">
-        <h2 className="font-semibold text-xl flex justify-center items-center">
-          All Users{" "}
-          <span className="text-gray-400 ml-2">{allUserData.length}</span>
-        </h2>
-        <div className="right flex gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-12">
+        <div className="w-full items-start">
+          <h2 className="font-semibold  w-full text-left text-xl flex  items-center">
+            All Users{" "}
+            <span className="text-gray-400 ml-2">{allUserData.length}</span>
+          </h2>
+        </div>
+        <div className="right flex gap-4 mt-2">
           <input
             type="text"
             name="search"

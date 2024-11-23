@@ -238,211 +238,211 @@ const RoleManagement = () => {
     });
   }, []);
 
-  return (
-    <div className="bg-white p-4 px-10 rounded shadow-lg">
-      <div className="flex justify-between gap-6">
-        <h1 className="mt-6 text-2xl font-semibold p-2">Roles Management</h1>
-        {loggedUser?.role.name !== "admin" ? (
-          <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-blue-300 capitalize text-blue-800 border-blue-800">
-            {loggedUser?.role.name}
-          </h1>
-        ) : (
-          <h1 className="mt-6 text-2xl font-semibold rounded-lg p-2 border bg-red-300 capitalize text-red-800 border-red-800">
-            {loggedUser?.role.name}
-          </h1>
-        )}
-      </div>
-      <p className="text-gray-500">Manage roles and their access.</p>
+return (
+  <div className="bg-white p-4 px-10 rounded shadow-lg">
+    <div className="flex justify-between gap-6">
+      <h1 className="mt-6 text-2xl font-semibold p-2">Roles Management</h1>
+      {loggedUser?.role.name !== "admin" ? (
+        <h1 className="mt-6 text-sm sm:text-2xl font-semibold rounded-lg p-2 border bg-blue-300 capitalize text-blue-800 border-blue-800">
+          {loggedUser?.role.name}
+        </h1>
+      ) : (
+        <h1 className="mt-6 h-10 sm:full flex justify-center items-center text-sm sm:text-2xl font-semibold rounded-lg p-2 border bg-red-300 capitalize text-red-800 border-red-800">
+          {loggedUser?.role.name}
+        </h1>
+      )}
+    </div>
+    <p className="text-gray-500">Manage roles and their access.</p>
 
-      <div className="flex justify-between items-center mt-12">
-        <h2 className="font-semibold text-xl flex justify-center items-center">
-          All Users{" "}
+    <div className="flex flex-col sm:flex-row justify-between items-center mt-12">
+      <div className="w-full items-start">
+        <h2 className="font-semibold  w-full text-left text-xl flex  items-center">
+          All Roles{" "}
           <span className="text-gray-400 ml-2">{allRoleData.length}</span>
         </h2>
-        <div className="right flex gap-4">
-          <input
-            type="text"
-            name="search"
-            placeholder="Search by name or email..."
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <div className="">
-            <div className="flex gap-5">
-              <DialogRole name="Add Role" onAddRole={addRole} />
-            </div>
+      </div>
+      <div className="mt-2 sm:mt-0 right flex gap-4">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search by name or email..."
+          className="border flex-1 border-gray-300 rounded-md px-4 py-0 sm:py-2 focus:outline-none focus:border-blue-500"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="flex-1">
+          <div className="flex gap-5">
+            <DialogRole name="Add Role" onAddRole={addRole} />
           </div>
         </div>
       </div>
+    </div>
 
-      <div className="overflow-x-auto min-h-96">
-        <table className="min-w-full mt-4 borde border-gray-300">
-          <thead>
-            <tr className="bg-gray-100 text-center">
-              <th className="px-4 py-2 text-left border-b">Name</th>
-              <th className="px-4 py-2 text-left border-b">Status</th>
-              <th className="px-4 py-2 text-left border-b">Access</th>
-              <th className="px-4 py-2 text-left border-b">Edit</th>
-              <th className="px-4 py-2 text-left border-b">Delete</th>
+    <div className="overflow-x-auto min-h-96">
+      <table className="min-w-full mt-4 borde border-gray-300">
+        <thead>
+          <tr className="bg-gray-100 text-center">
+            <th className="px-4 py-2 text-left border-b">Name</th>
+            <th className="px-4 py-2 text-left border-b">Status</th>
+            <th className="px-4 py-2 text-left border-b">Access</th>
+            <th className="px-4 py-2 text-left border-b">Edit</th>
+            <th className="px-4 py-2 text-left border-b">Delete</th>
 
-              {editAuth || deleteAuth ? (
-                <th className="px-4 py-2 text-left border-b">Actions</th>
-              ) : (
-                <th></th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRoles.map((role) => (
-              <tr key={role._id} className="bg-gray-50">
-                <td className="px-4 py-2 text-left border-b">{role.name}</td>
-                <td className="px-4 py-2 text-left border-b">
-                  {editingRole === role ? (
-                    <input
-                      type="checkbox"
-                      checked={editingPermissions.status}
-                      onChange={(e) =>
-                        updatePermissions(
-                          "status",
-                          e.target.checked,
-                          editingPermissions
-                        )
-                      }
-                      className="mr-2"
-                    />
-                  ) : role.permissions.status ? (
-                    "Yes"
-                  ) : (
-                    "No"
-                  )}
-                </td>
-                <td className="px-4 py-2 text-left border-b">
-                  {editingRole === role ? (
-                    <input
-                      type="checkbox"
-                      checked={editingPermissions.access}
-                      onChange={(e) =>
-                        updatePermissions(
-                          "access",
-                          e.target.checked,
-                          editingPermissions
-                        )
-                      }
-                      className="mr-2"
-                    />
-                  ) : role.permissions.access ? (
-                    "Yes"
-                  ) : (
-                    "No"
-                  )}
-                </td>
-                <td className="px-4 py-2 text-left border-b">
-                  {editingRole === role ? (
-                    <input
-                      type="checkbox"
-                      checked={editingPermissions.edit}
-                      onChange={(e) =>
-                        updatePermissions(
-                          "edit",
-                          e.target.checked,
-                          editingPermissions
-                        )
-                      }
-                      className="mr-2"
-                    />
-                  ) : role.permissions.edit ? (
-                    "Yes"
-                  ) : (
-                    "No"
-                  )}
-                </td>
-                <td className="px-4 py-2 text-left border-b">
-                  {editingRole === role ? (
-                    <input
-                      type="checkbox"
-                      checked={editingPermissions.delete}
-                      onChange={(e) =>
-                        updatePermissions(
-                          "delete",
-                          e.target.checked,
-                          editingPermissions
-                        )
-                      }
-                      className="mr-2"
-                    />
-                  ) : role.permissions.delete ? (
-                    "Yes"
-                  ) : (
-                    "No"
-                  )}
-                </td>
-                <td className="px-4 py-2 text-left border-b">
-                  {editingRole === role ? (
-                    <>
+            {editAuth || deleteAuth ? (
+              <th className="px-4 py-2 text-left border-b">Actions</th>
+            ) : (
+              <th></th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {filteredRoles.map((role) => (
+            <tr key={role._id} className="bg-gray-50">
+              <td className="px-4 py-2 text-left border-b">{role.name}</td>
+              <td className="px-4 py-2 text-left border-b">
+                {editingRole === role ? (
+                  <input
+                    type="checkbox"
+                    checked={editingPermissions.status}
+                    onChange={(e) =>
+                      updatePermissions(
+                        "status",
+                        e.target.checked,
+                        editingPermissions
+                      )
+                    }
+                    className="mr-2"
+                  />
+                ) : role.permissions.status ? (
+                  "Yes"
+                ) : (
+                  "No"
+                )}
+              </td>
+              <td className="px-4 py-2 text-left border-b">
+                {editingRole === role ? (
+                  <input
+                    type="checkbox"
+                    checked={editingPermissions.access}
+                    onChange={(e) =>
+                      updatePermissions(
+                        "access",
+                        e.target.checked,
+                        editingPermissions
+                      )
+                    }
+                    className="mr-2"
+                  />
+                ) : role.permissions.access ? (
+                  "Yes"
+                ) : (
+                  "No"
+                )}
+              </td>
+              <td className="px-4 py-2 text-left border-b">
+                {editingRole === role ? (
+                  <input
+                    type="checkbox"
+                    checked={editingPermissions.edit}
+                    onChange={(e) =>
+                      updatePermissions(
+                        "edit",
+                        e.target.checked,
+                        editingPermissions
+                      )
+                    }
+                    className="mr-2"
+                  />
+                ) : role.permissions.edit ? (
+                  "Yes"
+                ) : (
+                  "No"
+                )}
+              </td>
+              <td className="px-4 py-2 text-left border-b">
+                {editingRole === role ? (
+                  <input
+                    type="checkbox"
+                    checked={editingPermissions.delete}
+                    onChange={(e) =>
+                      updatePermissions(
+                        "delete",
+                        e.target.checked,
+                        editingPermissions
+                      )
+                    }
+                    className="mr-2"
+                  />
+                ) : role.permissions.delete ? (
+                  "Yes"
+                ) : (
+                  "No"
+                )}
+              </td>
+              <td className="px-4 py-2 text-left border-b">
+                {editingRole === role ? (
+                  <>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
+                      onClick={() => handleSaveEditRole(role)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-1 px-3 rounded"
+                      onClick={() => handleEditClick(role)}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {editAuth && (
                       <button
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
-                        onClick={() => handleSaveEditRole(role)}
-                      >
-                        Save
-                      </button>
-                      <button
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-1 px-3 rounded"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
                         onClick={() => handleEditClick(role)}
                       >
-                        Cancel
+                        Edit
                       </button>
-                    </>
-                  ) : (
-                    <>
-                      {editAuth && (
-                        <button
-                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
-                          onClick={() => handleEditClick(role)}
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {deleteAuth && (
-                        <button
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
-                          onClick={() => handleDeleteRole(role._id)}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-center mt-4">
-        <button
-          className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          Prev
-        </button>
-        <span className="px-4 py-2">
-          {currentPage} of {Math.ceil(allRoleData.length / rolesPerPage)}
-        </span>
-        <button
-          className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"
-          disabled={
-            currentPage === Math.ceil(allRoleData.length / rolesPerPage)
-          }
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+                    )}
+                    {deleteAuth && (
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded mt-1 sm:mt-0"
+                        onClick={() => handleDeleteRole(role._id)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
+
+    <div className="flex justify-center mt-4">
+      <button
+        className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"
+        disabled={currentPage === 1}
+        onClick={() => handlePageChange(currentPage - 1)}
+      >
+        Prev
+      </button>
+      <span className="px-4 py-2">
+        {currentPage} of {Math.ceil(allRoleData.length / rolesPerPage)}
+      </span>
+      <button
+        className="px-4 py-2 bg-gray-200 hover:bg-indigo-200 cursor-pointer rounded-md"
+        disabled={currentPage === Math.ceil(allRoleData.length / rolesPerPage)}
+        onClick={() => handlePageChange(currentPage + 1)}
+      >
+        Next
+      </button>
+    </div>
+  </div>
+);
 };
 
 export default RoleManagement;

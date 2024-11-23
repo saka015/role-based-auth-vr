@@ -18,7 +18,7 @@ const UserDashboard = () => {
 
   return (
     <div className="dot-bg min-h-screen flex flex-col pt-36 items-center">
-      <div className="min-h-96 min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">
+      <div className=" sm:min-h-96 max-w-72 sm:min-w-96  rounded-xl bg-indigo-100 border border-indigo-400 shadow-xl p-3">
         <span
           className={`float-right max-w-20 px-1 rounded-lg border text-center font-semibold text-sm capitalize ${
             loggedUser?.role.permissions.delete !== true
@@ -31,7 +31,7 @@ const UserDashboard = () => {
         <div className=" h-96 w-88 ml-8 flex flex-col justify-center items-center">
           <h1 className="text-3xl flex flex-col text-center">
             Welcome{" "}
-            <span className="text-indigo-600 text-5xl font-semibold">
+            <span className="text-indigo-600 text-xl sm:text-5xl font-semibold">
               {loggedUser?.name}!
             </span>
           </h1>

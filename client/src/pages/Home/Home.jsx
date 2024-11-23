@@ -53,33 +53,22 @@ const Home = () => {
         )}
 
         <div>
-          <h1 className="txt-gr text-center font-bold text-6xl text-indigo-500">
+          <h1 className="txt-gr text-center font-bold text-xl sm:text-6xl text-indigo-500">
             Seamless Role-Based Access
           </h1>
         </div>
         <div className="flex gap-4 mt-16">
           {user?.token ? (
             <>
-              {/* <button
-                onClick={logout}
-                className="px-10 py-3 bg-red-600 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600"
-              >
-                Logout
-              </button> */}
               <Link to="/user/dashboard">
-                <button className="px-10 py-3 bg-indigo-600 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
+                <button className="px-2 sm:px-10 py-3 bg-indigo-600 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
                   User Dashboard
                 </button>
               </Link>
-              {/* { (accessAuth || editAuth || deleteAuth) && (
-                <Link to="/admin/dashboard">
-                  <button className="px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
-                    Admin Dashboard
-                  </button>)} */}
 
               {(accessAuth || editAuth || deleteAuth) && (
                 <Link to="/admin/dashboard">
-                  <button className="px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
+                  <button className="px-2 sm:px-10 py-3 bg-indigo-900 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
                     Admin Dashboard
                   </button>
                 </Link>
@@ -88,12 +77,12 @@ const Home = () => {
           ) : (
             <>
               <Link to="/login">
-                <button className="px-10 py-3 hover:bg-indigo-600 shadow-xl transition-all border bg-white rounded-lg hover:text-white text-indigo-600">
+                <button className="px-4 sm:px-10 py-3 hover:bg-indigo-600 shadow-xl transition-all border bg-white rounded-lg hover:text-white text-indigo-600">
                   Login
                 </button>
               </Link>
               <Link to="/register">
-                <button className="px-10 py-3 bg-indigo-600 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
+                <button className="px-4 sm:px-10 py-3 bg-indigo-600 shadow-xl transition-all rounded-lg text-white hover:bg-white border hover:text-indigo-600">
                   Signup
                 </button>
               </Link>
