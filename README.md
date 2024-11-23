@@ -29,11 +29,10 @@ This project is a full-stack application providing secure user management with r
 
 * Dedicated admin interface for managing users and roles.
 * Comprehensive logging of user actions (audit trail).
+* Send Emails to new users
 
 
-### Other Features (Add as applicable)
 
-* [List any additional features here, e.g., file uploads, API integrations, etc.]
 
 
 ## Technologies Used
@@ -46,7 +45,7 @@ This project is a full-stack application providing secure user management with r
 * Ant Design for UI components
 * Axios for API calls
 * SweetAlert2 for user alerts
-* [List other frontend technologies if used]
+
 
 ### Backend
 
@@ -60,7 +59,6 @@ This project is a full-stack application providing secure user management with r
 * body-parser (for parsing request bodies)
 * cors (for handling Cross-Origin Resource Sharing)
 * dotenv (for environment variables)
-* express-session (session management - if not using JWT exclusively)
 * express-validator (input validation)
 
 ## Setup
