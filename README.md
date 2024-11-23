@@ -6,17 +6,17 @@ This project is a full-stack application providing secure user management with r
 
 ## .env configuration - Backend
 
-MONGO_URI=
-JWT_SECRET=
-SESSION_SECRET=
+- MONGO_URI=
+- JWT_SECRET=
+- SESSION_SECRET=
 
-# mailer data
+### mailer data
 
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_SERVICE=gmail
-SMTP_MAIL={put your gmail here}
-SMTP_PASSWORD={password you get from 'application password' from google account section}
+- SMTP_HOST=smtp.gmail.com
+- SMTP_PORT=465
+- SMTP_SERVICE=gmail
+- SMTP_MAIL={put your gmail here}
+- SMTP_PASSWORD={password you get from 'application password' from google account section}
 
 ## Features
 
@@ -89,13 +89,12 @@ SMTP_PASSWORD={password you get from 'application password' from google account 
    ```
 
 ## frontend
-cd client
 
+cd client
 
 ### Install client-side dependencies:
 
 npm install
-
 
 ## Navigate to the server directory:
 
@@ -104,7 +103,6 @@ cd ../server
 ### Install server-side dependencies:
 
 npm install
-
 
 # Start the development servers:
 
